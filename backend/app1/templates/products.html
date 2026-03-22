@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="shop-layout">
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+<h3>Bestsellers</h3>
+
+<p class="breadcrumb">Home • Bestsellers</p>
+
+<button class="reset-btn">Reset filters</button>
+
+<div class="filter-section">
+
+<h4>Brand</h4>
+
+<label><input type="checkbox"> Apple</label>
+<label><input type="checkbox"> Samsung</label>
+<label><input type="checkbox"> Sony</label>
+<label><input type="checkbox"> LG</label>
+
+</div>
+
+<div class="filter-section">
+<h4>Price</h4>
+<input type="range">
+</div>
+
+</aside>
+
+
+<!-- ================= PRODUCT AREA ================= -->
+
+<section class="catalog">
+
+<!-- CATEGORY MENU -->
+
+<div class="category-tabs">
+
+<button class="tab active">All items</button>
+<button class="tab">Smartphones</button>
+<button class="tab">Kitchen</button>
+<button class="tab">Game Console</button>
+
+<button class="top-rated">Top rated</button>
+
+</div>
+
+
+<!-- PRODUCTS -->
+
+<div class="product-grid">
+
+{% for p in products %}
+
+<div class="product-card">
+
+<span class="sale">Sale 15%</span>
+
+<div class="wishlist">♡</div>
+
+<a href="{% url 'product_detail' p.id %}">
+<img src="{{p.images.first.image.url}}">
+</a>
+
+<div class="product-info">
+
+<p class="brand">{{p.category.name}}</p>
+
+<h4>{{p.name}}</h4>
+
+<div class="price-row">
+<span class="price">₹{{p.price}}</span>
+<span class="rating">★ 4.8</span>
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</section>
+
+</div>
+
+{% endblock %}

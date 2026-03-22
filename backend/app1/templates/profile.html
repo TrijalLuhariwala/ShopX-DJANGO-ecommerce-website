@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Wallet ₹{{wallet.balance}}</h2>
+
+<form method="post" action="/wallet/add/">
+{% csrf_token %}
+<input type="number"
+step="0.01"
+name="amount"
+placeholder="Add Money">
+<button>Add</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="product-page">
+
+<div>
+<button onclick="prev()">❮</button>
+
+<img id="slide"
+src="{{product.images.first.image.url}}">
+
+<button onclick="next()">❯</button>
+
+{% for img in product.images.all %}
+<img class="thumb"
+src="{{img.image.url}}"
+onclick="setImage(this.src)">
+{% endfor %}
+</div>
+
+<div>
+
+<h1>{{product.name}}</h1>
+<h2>₹{{product.price}}</h2>
+
+<p>{{product.description}}</p>
+
+<a onclick="popup()"
+href="/cart/add/{{product.id}}">
+<button>Add To Cart</button>
+</a>
+
+</div>
+
+</div>
+
+{% endblock %}

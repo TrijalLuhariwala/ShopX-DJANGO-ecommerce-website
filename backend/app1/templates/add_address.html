@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add Address</h2>
+
+<form method="post">
+{% csrf_token %}
+
+<input name="full_name" placeholder="Full Name">
+<input name="phone" placeholder="Phone">
+
+<textarea name="street"
+placeholder="Street Address"></textarea>
+
+<input name="city" placeholder="City">
+<input name="state" placeholder="State">
+<input name="pincode" placeholder="Pincode">
+
+<button>Save Address</button>
+
+</form>
+
+{% endblock %}

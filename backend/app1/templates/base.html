@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ShopX</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+<div class="nav-left">
+<h2 class="logo">Protech</h2>
+
+<button class="catalog-btn">☰ Catalog</button>
+
+<a class="nav-link active">Bestsellers</a>
+<a class="nav-link">Sale</a>
+<a class="nav-link">New Arrivals</a>
+</div>
+
+<div class="nav-right">
+<input class="search" placeholder="Search products">
+
+<a href="{% url 'cart' %}" class="icon-btn">
+🛒 Cart ({{cart_count}})
+</a>
+
+<a href="{% url 'login' %}" class="icon-btn">
+👤 Login
+</a>
+</div>
+
+</header>
+
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

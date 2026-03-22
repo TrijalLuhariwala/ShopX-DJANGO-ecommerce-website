@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Checkout</h2>
+
+<form method="post" action="{% url 'place_order' %}">
+{% csrf_token %}
+
+<select name="address">
+{% for a in addresses %}
+<option value="{{ a.id }}">{{ a.street }}</option>
+{% endfor %}
+</select>
+
+<br><br>
+<button>Pay Now (Fake)</button>
+
+</form>
+
+{% endblock %}

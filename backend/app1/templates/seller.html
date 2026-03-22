@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>Seller Dashboard</h2>
+<button class="add-product-btn"
+onclick="openModal()">
++ Add Product
+</button>
+<hr>
+
+<!-- ================= CATEGORY SELECTION (GET) ================= -->
+
+<h3>Select Category</h3>
+
+<form method="get" action="{% url 'seller' %}">
+    
+    <label>Select Product Category</label><br>
+    
+    <select name="category" onchange="this.form.submit()" required>
+        <option value="">-- Choose Category --</option>
+
+        {% for c in categories %}
+            <option value="{{ c.id }}"
+                {% if selected_category == c.id|stringformat:"s" %}selected{% endif %}>
+                {{ c.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+</form>
+
+<br><br>
+
+<!-- ================= ADD PRODUCT FORM ================= -->
+
+<h3>Add New Product</h3>
+
+<form method="post"
+      action="{% url 'add_product' %}"
+      enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<!-- Hidden category field -->
+<input type="hidden" name="category" value="{{ selected_category }}">
+
+<label>Product Name</label><br>
+<input type="text"
+       name="name"
+       placeholder="Enter product name"
+       required><br><br>
+
+
+<label>Price</label><br>
+<input type="number"
+       name="price"
+       placeholder="Enter price"
+       step="0.01"
+       min="0"
+       required><br><br>
+
+
+<label>Description</label><br>
+<textarea name="description"
+          placeholder="Enter product description"
+          rows="4"
+          required></textarea><br><br>
+
+
+<label>Upload Product Images</label><br>
+<input type="file"
+       name="images"
+       multiple
+       accept="image/*"
+       required><br><br>
+
+
+<label>Select Subcategory</label><br>
+<select name="subcategory" required>
+    <option value="">-- Choose Subcategory --</option>
+
+    {% for s in subcategories %}
+        <option value="{{ s.id }}">
+            {{ s.name }}
+        </option>
+    {% endfor %}
+</select>
+
+<br><br>
+
+<button type="submit">Add Product</button>
+
+</form>
+
+<hr>
+
+<!-- ================= SELLER PRODUCTS ================= -->
+
+<h3>Your Products</h3>
+
+<div class="grid">
+
+{% for p in products %}
+<div class="card">
+
+    {% if p.images.all %}
+        <img src="{{ p.images.first.image.url }}" width="150">
+    {% endif %}
+
+    <h4>{{ p.name }}</h4>
+    <p>₹{{ p.price }}</p>
+
+</div>
+{% empty %}
+<p>No products added yet.</p>
+{% endfor %}
+
+</div>
+<div id="productModal" class="modal">
+
+<div class="modal-content">
+
+<span class="close"
+onclick="closeModal()">✕</span>
+
+<h2>Add New Product</h2>
+
+<form method="post"
+action="{% url 'add_product' %}"
+enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<input name="name"
+placeholder="Product Name"
+required>
+
+<input type="number"
+step="0.01"
+name="price"
+placeholder="Price"
+required>
+
+<textarea name="description"
+placeholder="Description"></textarea>
+
+<select name="category">
+{% for c in categories %}
+<option value="{{c.id}}">
+{{c.name}}
+</option>
+{% endfor %}
+</select>
+
+<select name="subcategory">
+{% for s in subcategories %}
+<option value="{{s.id}}">
+{{s.name}}
+</option>
+{% endfor %}
+</select>
+
+<!-- DRAG DROP AREA -->
+
+<div id="drop-area">
+
+<p>Drag & Drop Images</p>
+<input type="file"
+id="fileInput"
+name="images"
+multiple
+hidden>
+
+<button type="button"
+onclick="fileInput.click()">
+Browse Files
+</button>
+
+</div>
+
+<!-- IMAGE PREVIEW -->
+
+<div id="preview"></div>
+
+<button type="submit">
+Add Product
+</button>
+
+</form>
+
+</div>
+</div>
+{% endblock %}
