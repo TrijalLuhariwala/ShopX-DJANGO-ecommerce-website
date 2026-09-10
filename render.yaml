@@ -3,7 +3,7 @@ services:
     name: shopx-retailpulse-api
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_retail_demo
     startCommand: gunicorn ecommerce.wsgi:application
     healthCheckPath: /api/analytics/dashboard/
     envVars:

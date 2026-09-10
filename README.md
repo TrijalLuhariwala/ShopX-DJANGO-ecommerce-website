@@ -26,6 +26,7 @@ Backend (Python 3.10+):
 cd backend
 python -m pip install -r requirements.txt
 python manage.py migrate
+python manage.py seed_retail_demo
 python manage.py runserver
 ```
 
@@ -53,3 +54,8 @@ direct page refreshes.
 
 Uploaded media is local storage by default; add Cloudinary or S3 before relying
 on user uploads in production.
+
+The `seed_retail_demo` command creates deterministic products, customers and
+240 paid orders on an empty database, and safely skips databases that already
+contain orders. It powers the hosted analytics demonstration without committing
+local database files.
