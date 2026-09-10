@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const BASE_URL = '/api';
+// Vite proxies /api during local development. Production uses the public
+// Django API URL set by the deployment platform (never put secrets in VITE_*).
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: BASE_URL,

@@ -42,7 +42,14 @@ to the Django server.
 
 ## Deployment notes
 
-For production, set `DJANGO_SECRET_KEY`, `EMAIL_HOST_USER`,
+For production, set `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`,
+`CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`, `EMAIL_HOST_USER`,
 `EMAIL_HOST_PASSWORD`, and `DEFAULT_FROM_EMAIL` in the hosting provider's
-secret store. Use PostgreSQL rather than SQLite, migrate the indexes, and
-restrict the public analytics routes to demo-safe aggregate data or staff.
+secret store. The included `render.yaml` creates a PostgreSQL-backed Django
+service. Deploy `frontend/` separately on Vercel, set `VITE_API_URL` to the
+Render API URL ending in `/api`, and add the Vercel URL to Render's CORS and
+CSRF environment variables. `frontend/vercel.json` preserves React routes on
+direct page refreshes.
+
+Uploaded media is local storage by default; add Cloudinary or S3 before relying
+on user uploads in production.

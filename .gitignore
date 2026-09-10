@@ -1,0 +1,18 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+staticfiles/
+.env
+.env.*
+!.env.example
+.ipynb_checkpoints/
+
+# JavaScript builds and dependencies
+node_modules/
+frontend/dist/
+
+# Editor / OS files
+.DS_Store
+.vscode/
+.idea/

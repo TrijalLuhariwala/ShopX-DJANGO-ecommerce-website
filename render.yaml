@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: shopx-retailpulse-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn ecommerce.wsgi:application
+    healthCheckPath: /api/analytics/dashboard/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shopx-retailpulse-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: shopx-retailpulse-api.onrender.com
+
+databases:
+  - name: shopx-retailpulse-db
+    databaseName: shopx
+    user: shopx
