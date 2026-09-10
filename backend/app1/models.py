@@ -89,6 +89,9 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} - {self.user.username}"
 
+    class Meta:
+        indexes = [models.Index(fields=["status", "created_at"], name="order_status_created_idx")]
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -98,6 +101,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (Order {self.order.id})"
+
+    class Meta:
+        indexes = [models.Index(fields=["product", "order"], name="item_product_order_idx")]
 
 class Wishlist(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)

@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db import transaction
+from django.db.models import F
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -12,6 +14,7 @@ from .models import (
     User, Wallet, Address, Category, SubCategory,
     Product, ProductImage, Cart, CartItem, Order, OrderItem, Wishlist
 )
+from .analytics import dashboard_metrics, performance_profile
 
 
 def get_tokens_for_user(user):
@@ -212,7 +215,14 @@ def cart_view(request):
 def add_to_cart(request, id):
     product = get_object_or_404(Product, id=id)
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    quantity = int(request.data.get('quantity', 1))
+    try:
+        quantity = int(request.data.get('quantity', 1))
+    except (TypeError, ValueError):
+        return Response({'error': 'Quantity must be a whole number'}, status=400)
+    if quantity < 1:
+        return Response({'error': 'Quantity must be at least 1'}, status=400)
+    if quantity > product.stock_available:
+        return Response({'error': 'Requested quantity exceeds available stock'}, status=400)
     item, created = CartItem.objects.get_or_create(cart=cart, product=product)
     if not created:
         item.quantity += quantity
@@ -250,48 +260,32 @@ def remove_from_cart(request, id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def place_order(request):
-    try:
-        cart = Cart.objects.get(user=request.user)
-    except Cart.DoesNotExist:
-        return Response({'error': 'Cart is empty'}, status=400)
-
-    items = cart.cartitem_set.select_related('product__seller').all()
-    if not items.exists():
-        return Response({'error': 'Cart is empty'}, status=400)
-
     address_id = request.data.get('address_id')
     if not address_id:
         return Response({'error': 'address_id required'}, status=400)
-
-    address = get_object_or_404(Address, id=address_id, user=request.user)
-
-    total = sum(i.product.price * i.quantity for i in items)
-
-    wallet, _ = Wallet.objects.get_or_create(user=request.user)
-    if wallet.balance < total:
-        return Response({'error': 'Insufficient wallet balance'}, status=400)
-
-    wallet.balance -= total
-    wallet.save()
-
-    order = Order.objects.create(
-        user=request.user,
-        address=address,
-        total=total,
-        payment_method='WALLET',
-        status='PAID'
-    )
-
-    for item in items:
-        OrderItem.objects.create(
-            order=order,
-            product=item.product,
-            seller=item.product.seller,
-            quantity=item.quantity,
-            price=item.product.price
-        )
-
-    cart.cartitem_set.all().delete()
+    with transaction.atomic():
+        cart = Cart.objects.select_for_update().filter(user=request.user).first()
+        if not cart:
+            return Response({'error': 'Cart is empty'}, status=400)
+        items = list(cart.cartitem_set.select_related('product__seller').select_for_update())
+        if not items:
+            return Response({'error': 'Cart is empty'}, status=400)
+        address = get_object_or_404(Address, id=address_id, user=request.user)
+        products = {p.id: p for p in Product.objects.select_for_update().filter(id__in=[i.product_id for i in items])}
+        for item in items:
+            if item.quantity > products[item.product_id].stock_available:
+                return Response({'error': f'Only {products[item.product_id].stock_available} units of {item.product.name} remain'}, status=400)
+        total = sum(i.product.price * i.quantity for i in items)
+        wallet, _ = Wallet.objects.select_for_update().get_or_create(user=request.user)
+        if wallet.balance < total:
+            return Response({'error': 'Insufficient wallet balance'}, status=400)
+        wallet.balance -= total
+        wallet.save(update_fields=['balance'])
+        order = Order.objects.create(user=request.user, address=address, total=total, payment_method='WALLET', status='PAID')
+        for item in items:
+            OrderItem.objects.create(order=order, product=item.product, seller=item.product.seller, quantity=item.quantity, price=item.product.price)
+            Product.objects.filter(id=item.product_id).update(stock_available=F('stock_available') - item.quantity)
+        cart.cartitem_set.all().delete()
 
     return Response({
         'order_id': order.id,
@@ -508,3 +502,17 @@ def toggle_wishlist(request, id):
 def wishlist_view(request):
     items = Wishlist.objects.filter(user=request.user).select_related('product').prefetch_related('product__images')
     return Response([product_to_dict(w.product) for w in items])
+
+
+# ── RetailPulse analytics / governed query lab ───────────────────────────────
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def analytics_dashboard(request):
+    return Response(dashboard_metrics())
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def analytics_query_lab(request):
+    return Response(performance_profile())

@@ -49,6 +49,7 @@ const Header = () => {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
+            <Link to="/analytics" className="px-3 py-2 text-sm font-medium text-foreground hover:text-accent transition-colors">Analytics</Link>
             {navCategories.map((cat) =>
               <Link
                 key={cat.id}
@@ -121,6 +122,7 @@ const Header = () => {
       {mobileMenuOpen &&
         <div className="lg:hidden border-t border-border bg-card animate-fade-in">
           <div className="container mx-auto px-4 py-4 space-y-2">
+            <Link to="/analytics" className="block text-sm font-medium text-foreground py-2 hover:text-accent" onClick={() => setMobileMenuOpen(false)}>Analytics</Link>
             {navCategories.map((cat) =>
               <Link
                 key={cat.id}

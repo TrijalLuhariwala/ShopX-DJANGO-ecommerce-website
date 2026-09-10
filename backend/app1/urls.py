@@ -40,4 +40,8 @@ urlpatterns = [
     # Wishlist
     path("wishlist/", views.wishlist_view, name="wishlist"),
     path("wishlist/<int:id>/", views.toggle_wishlist, name="toggle_wishlist"),
+
+    # RetailPulse analytics
+    path("analytics/dashboard/", views.analytics_dashboard, name="analytics_dashboard"),
+    path("analytics/query-lab/", views.analytics_query_lab, name="analytics_query_lab"),
 ]

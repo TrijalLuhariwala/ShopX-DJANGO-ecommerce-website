@@ -15,6 +15,7 @@ import BuyerDashboard from "./pages/BuyerDashboard";
 import SellerDashboard from "./pages/SellerDashboard";
 import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
+import Analytics from "./pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () =>
                 <Route path="/account" element={<BuyerDashboard />} />
                 <Route path="/seller" element={<SellerDashboard />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/analytics" element={<Analytics />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

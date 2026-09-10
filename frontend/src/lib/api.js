@@ -85,4 +85,8 @@ export const apiGetSellerOrders = () => api.get('/seller/orders/');
 export const apiGetWishlist = () => api.get('/wishlist/');
 export const apiToggleWishlist = (productId) => api.post(`/wishlist/${productId}/`);
 
+// ── RetailPulse analytics ───────────────────────────────────────────────────
+export const apiGetAnalyticsDashboard = () => api.get('/analytics/dashboard/');
+export const apiGetQueryLab = () => api.get('/analytics/query-lab/');
+
 export default api;
